@@ -770,7 +770,7 @@ var _ = Describe("installer HostRoleMaster role", func() {
 								{string(models.HostStageWaitingForControlPlane), waitingForMastersStatusInfo},
 								{string(models.HostStageInstalling), string(models.HostRoleMaster)},
 								{string(models.HostStageWritingImageToDisk)},
-								{string(models.HostStageCopyingRegistryDataToDisk)},
+								{string(hostStageCopyingRegistryDataToDisk)},
 								{string(models.HostStageRebooting)},
 							})
 							bootstrapSetup("agent-installer")
@@ -812,7 +812,7 @@ var _ = Describe("installer HostRoleMaster role", func() {
 							updateProgressSuccess([][]string{{string(models.HostStageStartingInstallation), conf.Role},
 								{string(models.HostStageInstalling), string(models.HostRoleMaster)},
 								{string(models.HostStageWritingImageToDisk)},
-								{string(models.HostStageCopyingRegistryDataToDisk)},
+								{string(hostStageCopyingRegistryDataToDisk)},
 							})
 							bootstrapSetup("agent-installer")
 							checkLocalHostname("notlocalhost", nil)

@@ -20,12 +20,12 @@ type API interface {
 	/*
 	   V2GetBundle gets operator properties for a bundle
 
-	   Retrieves an array of operator properties for the specified bundle when some features are activated.*/
+	   Retrieves an array of operator properties for the specified bundle.*/
 	V2GetBundle(ctx context.Context, params *V2GetBundleParams) (*V2GetBundleOK, error)
 	/*
-	   V2ListBundles gets list of available bundles
+	   V2ListBundles gets list of avaliable bundles
 
-	   Retrieves a list of available bundles filtered by support level.*/
+	   Retrieves a list of avaliable bundles.*/
 	V2ListBundles(ctx context.Context, params *V2ListBundlesParams) (*V2ListBundlesOK, error)
 	/*
 	   V2ListOfClusterOperators Lists operators to be monitored for a cluster.*/
@@ -62,7 +62,7 @@ type Client struct {
 /*
 V2GetBundle gets operator properties for a bundle
 
-Retrieves an array of operator properties for the specified bundle when some features are activated.
+Retrieves an array of operator properties for the specified bundle.
 */
 func (a *Client) V2GetBundle(ctx context.Context, params *V2GetBundleParams) (*V2GetBundleOK, error) {
 
@@ -87,9 +87,9 @@ func (a *Client) V2GetBundle(ctx context.Context, params *V2GetBundleParams) (*V
 }
 
 /*
-V2ListBundles gets list of available bundles
+V2ListBundles gets list of avaliable bundles
 
-Retrieves a list of available bundles filtered by support level.
+Retrieves a list of avaliable bundles.
 */
 func (a *Client) V2ListBundles(ctx context.Context, params *V2ListBundlesParams) (*V2ListBundlesOK, error) {
 

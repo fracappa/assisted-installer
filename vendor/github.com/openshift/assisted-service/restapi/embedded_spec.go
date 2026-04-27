@@ -1230,7 +1230,8 @@ func init() {
               "worker.ign",
               "install-config.yaml",
               "custom_manifests.json",
-              "custom_manifests.yaml"
+              "custom_manifests.yaml",
+              "arbiter.ign"
             ],
             "type": "string",
             "description": "The file to be downloaded.",
@@ -1446,6 +1447,7 @@ func init() {
           {
             "enum": [
               "master",
+              "arbiter",
               "worker",
               "auto-assign"
             ],
@@ -6000,21 +6002,28 @@ func init() {
               "items": {
                 "type": "string",
                 "enum": [
+                  "amd-gpu",
                   "lso",
                   "mtv",
-                  "openshift_ai",
+                  "openshift-ai",
                   "osc",
                   "servicemesh",
                   "authorino",
                   "cnv",
-                  "nvidia_gpu",
+                  "nvidia-gpu",
                   "pipelines",
                   "odf",
                   "lvm",
                   "mce",
-                  "node_feature_discovery",
+                  "node-feature-discovery",
                   "serverless",
-                  "nmstate"
+                  "nmstate",
+                  "kmm",
+                  "node-healthcheck",
+                  "self-node-remediation",
+                  "fence-agents-remediation",
+                  "node-maintenance",
+                  "kube-descheduler"
                 ]
               }
             }
@@ -6438,13 +6447,18 @@ func init() {
           "x-go-custom-tag": "gorm:\"column:https_proxy\""
         },
         "hyperthreading": {
-          "description": "Enable/disable hyperthreading on master nodes, worker nodes, or all nodes",
+          "description": "Enable/disable hyperthreading on master nodes, arbiter nodes, worker nodes, or a combination of them.",
           "type": "string",
           "enum": [
+            "none",
             "masters",
+            "arbiters",
             "workers",
-            "all",
-            "none"
+            "masters,arbiters",
+            "masters,workers",
+            "arbiters,workers",
+            "masters,arbiters,workers",
+            "all"
           ]
         },
         "id": {
@@ -6790,13 +6804,18 @@ func init() {
           "x-nullable": true
         },
         "hyperthreading": {
-          "description": "Enable/disable hyperthreading on master nodes, worker nodes, or all nodes.",
+          "description": "Enable/disable hyperthreading on master nodes, arbiter nodes, worker nodes, or a combination of them.",
           "type": "string",
           "default": "all",
           "enum": [
-            "masters",
-            "workers",
             "none",
+            "masters",
+            "arbiters",
+            "workers",
+            "masters,arbiters",
+            "masters,workers",
+            "arbiters,workers",
+            "masters,arbiters,workers",
             "all"
           ]
         },
@@ -7056,7 +7075,12 @@ func init() {
         "authorino-requirements-satisfied",
         "nmstate-requirements-satisfied",
         "amd-gpu-requirements-satisfied",
-        "kmm-requirements-satisfied"
+        "kmm-requirements-satisfied",
+        "node-healthcheck-requirements-satisfied",
+        "self-node-remediation-requirements-satisfied",
+        "fence-agents-remediation-requirements-satisfied",
+        "node-maintenance-requirements-satisfied",
+        "kube-descheduler-requirements-satisfied"
       ]
     },
     "cluster_default_config": {
@@ -7535,14 +7559,19 @@ func init() {
       "type": "object",
       "properties": {
         "enable_on": {
-          "description": "Enable/disable disk encryption on master nodes, worker nodes, or all nodes.",
+          "description": "Enable/disable disk encryption on master nodes, arbiter nodes, worker nodes, or a combination of them.",
           "type": "string",
           "default": "none",
           "enum": [
             "none",
-            "all",
             "masters",
-            "workers"
+            "arbiters",
+            "workers",
+            "masters,arbiters",
+            "masters,workers",
+            "arbiters,workers",
+            "masters,arbiters,workers",
+            "all"
           ]
         },
         "mode": {
@@ -7875,6 +7904,7 @@ func init() {
       "type": "string",
       "enum": [
         "SNO",
+        "TNA",
         "VIP_AUTO_ALLOC",
         "CUSTOM_MANIFEST",
         "SINGLE_NODE_EXPANSION",
@@ -7897,7 +7927,6 @@ func init() {
         "EXTERNAL_PLATFORM_OCI",
         "DUAL_STACK",
         "PLATFORM_MANAGED_NETWORKING",
-        "SKIP_MCO_REBOOT",
         "EXTERNAL_PLATFORM",
         "OVN_NETWORK_TYPE",
         "SDN_NETWORK_TYPE",
@@ -7912,7 +7941,12 @@ func init() {
         "USER_MANAGED_LOAD_BALANCER",
         "NMSTATE",
         "AMD_GPU",
-        "KMM"
+        "KMM",
+        "NODE_HEALTHCHECK",
+        "SELF_NODE_REMEDIATION",
+        "FENCE_AGENTS_REMEDIATION",
+        "NODE_MAINTENANCE",
+        "KUBE_DESCHEDULER"
       ]
     },
     "finalizing-stage": {
@@ -8368,6 +8402,7 @@ func init() {
       "enum": [
         "auto-assign",
         "master",
+        "arbiter",
         "worker",
         "bootstrap"
       ]
@@ -8377,6 +8412,7 @@ func init() {
       "enum": [
         "auto-assign",
         "master",
+        "arbiter",
         "worker"
       ]
     },
@@ -8453,6 +8489,7 @@ func init() {
           "enum": [
             "auto-assign",
             "master",
+            "arbiter",
             "worker"
           ],
           "x-nullable": true
@@ -8541,7 +8578,12 @@ func init() {
         "mtu-valid",
         "nmstate-requirements-satisfied",
         "amd-gpu-requirements-satisfied",
-        "kmm-requirements-satisfied"
+        "kmm-requirements-satisfied",
+        "node-healthcheck-requirements-satisfied",
+        "self-node-remediation-requirements-satisfied",
+        "fence-agents-remediation-requirements-satisfied",
+        "node-maintenance-requirements-satisfied",
+        "kube-descheduler-requirements-satisfied"
       ]
     },
     "host_network": {
@@ -9664,6 +9706,10 @@ func init() {
           "format": "uuid",
           "x-go-custom-tag": "gorm:\"primaryKey\""
         },
+        "dependency_only": {
+          "description": "Whether the operator can't be installed without being required by another operator.",
+          "type": "boolean"
+        },
         "name": {
           "description": "Unique name of the operator.",
           "type": "string",
@@ -10694,13 +10740,18 @@ func init() {
           "x-nullable": true
         },
         "hyperthreading": {
-          "description": "Enable/disable hyperthreading on master nodes, worker nodes, or all nodes.",
+          "description": "Enable/disable hyperthreading on master nodes, arbiter nodes, worker nodes, or a combination of them.",
           "type": "string",
           "enum": [
+            "none",
             "masters",
+            "arbiters",
             "workers",
-            "all",
-            "none"
+            "masters,arbiters",
+            "masters,workers",
+            "arbiters,workers",
+            "masters,arbiters,workers",
+            "all"
           ],
           "x-nullable": true
         },
@@ -12189,7 +12240,8 @@ func init() {
               "worker.ign",
               "install-config.yaml",
               "custom_manifests.json",
-              "custom_manifests.yaml"
+              "custom_manifests.yaml",
+              "arbiter.ign"
             ],
             "type": "string",
             "description": "The file to be downloaded.",
@@ -12405,6 +12457,7 @@ func init() {
           {
             "enum": [
               "master",
+              "arbiter",
               "worker",
               "auto-assign"
             ],
@@ -16964,21 +17017,28 @@ func init() {
               "items": {
                 "type": "string",
                 "enum": [
+                  "amd-gpu",
                   "lso",
                   "mtv",
-                  "openshift_ai",
+                  "openshift-ai",
                   "osc",
                   "servicemesh",
                   "authorino",
                   "cnv",
-                  "nvidia_gpu",
+                  "nvidia-gpu",
                   "pipelines",
                   "odf",
                   "lvm",
                   "mce",
-                  "node_feature_discovery",
+                  "node-feature-discovery",
                   "serverless",
-                  "nmstate"
+                  "nmstate",
+                  "kmm",
+                  "node-healthcheck",
+                  "self-node-remediation",
+                  "fence-agents-remediation",
+                  "node-maintenance",
+                  "kube-descheduler"
                 ]
               }
             }
@@ -17520,13 +17580,18 @@ func init() {
           "x-go-custom-tag": "gorm:\"column:https_proxy\""
         },
         "hyperthreading": {
-          "description": "Enable/disable hyperthreading on master nodes, worker nodes, or all nodes",
+          "description": "Enable/disable hyperthreading on master nodes, arbiter nodes, worker nodes, or a combination of them.",
           "type": "string",
           "enum": [
+            "none",
             "masters",
+            "arbiters",
             "workers",
-            "all",
-            "none"
+            "masters,arbiters",
+            "masters,workers",
+            "arbiters,workers",
+            "masters,arbiters,workers",
+            "all"
           ]
         },
         "id": {
@@ -17872,13 +17937,18 @@ func init() {
           "x-nullable": true
         },
         "hyperthreading": {
-          "description": "Enable/disable hyperthreading on master nodes, worker nodes, or all nodes.",
+          "description": "Enable/disable hyperthreading on master nodes, arbiter nodes, worker nodes, or a combination of them.",
           "type": "string",
           "default": "all",
           "enum": [
-            "masters",
-            "workers",
             "none",
+            "masters",
+            "arbiters",
+            "workers",
+            "masters,arbiters",
+            "masters,workers",
+            "arbiters,workers",
+            "masters,arbiters,workers",
             "all"
           ]
         },
@@ -18138,7 +18208,12 @@ func init() {
         "authorino-requirements-satisfied",
         "nmstate-requirements-satisfied",
         "amd-gpu-requirements-satisfied",
-        "kmm-requirements-satisfied"
+        "kmm-requirements-satisfied",
+        "node-healthcheck-requirements-satisfied",
+        "self-node-remediation-requirements-satisfied",
+        "fence-agents-remediation-requirements-satisfied",
+        "node-maintenance-requirements-satisfied",
+        "kube-descheduler-requirements-satisfied"
       ]
     },
     "cluster_default_config": {
@@ -18617,14 +18692,19 @@ func init() {
       "type": "object",
       "properties": {
         "enable_on": {
-          "description": "Enable/disable disk encryption on master nodes, worker nodes, or all nodes.",
+          "description": "Enable/disable disk encryption on master nodes, arbiter nodes, worker nodes, or a combination of them.",
           "type": "string",
           "default": "none",
           "enum": [
             "none",
-            "all",
             "masters",
-            "workers"
+            "arbiters",
+            "workers",
+            "masters,arbiters",
+            "masters,workers",
+            "arbiters,workers",
+            "masters,arbiters,workers",
+            "all"
           ]
         },
         "mode": {
@@ -18924,6 +19004,7 @@ func init() {
       "type": "string",
       "enum": [
         "SNO",
+        "TNA",
         "VIP_AUTO_ALLOC",
         "CUSTOM_MANIFEST",
         "SINGLE_NODE_EXPANSION",
@@ -18946,7 +19027,6 @@ func init() {
         "EXTERNAL_PLATFORM_OCI",
         "DUAL_STACK",
         "PLATFORM_MANAGED_NETWORKING",
-        "SKIP_MCO_REBOOT",
         "EXTERNAL_PLATFORM",
         "OVN_NETWORK_TYPE",
         "SDN_NETWORK_TYPE",
@@ -18961,7 +19041,12 @@ func init() {
         "USER_MANAGED_LOAD_BALANCER",
         "NMSTATE",
         "AMD_GPU",
-        "KMM"
+        "KMM",
+        "NODE_HEALTHCHECK",
+        "SELF_NODE_REMEDIATION",
+        "FENCE_AGENTS_REMEDIATION",
+        "NODE_MAINTENANCE",
+        "KUBE_DESCHEDULER"
       ]
     },
     "finalizing-stage": {
@@ -19417,6 +19502,7 @@ func init() {
       "enum": [
         "auto-assign",
         "master",
+        "arbiter",
         "worker",
         "bootstrap"
       ]
@@ -19426,6 +19512,7 @@ func init() {
       "enum": [
         "auto-assign",
         "master",
+        "arbiter",
         "worker"
       ]
     },
@@ -19502,6 +19589,7 @@ func init() {
           "enum": [
             "auto-assign",
             "master",
+            "arbiter",
             "worker"
           ],
           "x-nullable": true
@@ -19590,7 +19678,12 @@ func init() {
         "mtu-valid",
         "nmstate-requirements-satisfied",
         "amd-gpu-requirements-satisfied",
-        "kmm-requirements-satisfied"
+        "kmm-requirements-satisfied",
+        "node-healthcheck-requirements-satisfied",
+        "self-node-remediation-requirements-satisfied",
+        "fence-agents-remediation-requirements-satisfied",
+        "node-maintenance-requirements-satisfied",
+        "kube-descheduler-requirements-satisfied"
       ]
     },
     "host_network": {
@@ -20704,6 +20797,10 @@ func init() {
           "format": "uuid",
           "x-go-custom-tag": "gorm:\"primaryKey\""
         },
+        "dependency_only": {
+          "description": "Whether the operator can't be installed without being required by another operator.",
+          "type": "boolean"
+        },
         "name": {
           "description": "Unique name of the operator.",
           "type": "string",
@@ -21708,13 +21805,18 @@ func init() {
           "x-nullable": true
         },
         "hyperthreading": {
-          "description": "Enable/disable hyperthreading on master nodes, worker nodes, or all nodes.",
+          "description": "Enable/disable hyperthreading on master nodes, arbiter nodes, worker nodes, or a combination of them.",
           "type": "string",
           "enum": [
+            "none",
             "masters",
+            "arbiters",
             "workers",
-            "all",
-            "none"
+            "masters,arbiters",
+            "masters,workers",
+            "arbiters,workers",
+            "masters,arbiters,workers",
+            "all"
           ],
           "x-nullable": true
         },

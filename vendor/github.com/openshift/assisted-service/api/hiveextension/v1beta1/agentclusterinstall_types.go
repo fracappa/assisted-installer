@@ -22,7 +22,7 @@ const (
 	ClusterInstallationStoppedReason string = "ClusterInstallationStopped"
 	ClusterInstallationStoppedMsg    string = "The cluster installation stopped"
 	ClusterInsufficientAgentsReason  string = "InsufficientAgents"
-	ClusterInsufficientAgentsMsg     string = "The cluster currently requires exactly %d master agents, %d arbiter agents and %d worker agents, but currently registered %d master agents, %d arbiter agents and %d worker agents"
+	ClusterInsufficientAgentsMsg     string = "The cluster currently requires exactly %d master agents and %d worker agents, but currently registered %d master agents and %d worker agents"
 	ClusterUnapprovedAgentsReason    string = "UnapprovedAgents"
 	ClusterUnapprovedAgentsMsg       string = "The installation is pending on the approval of %d agents"
 	ClusterUnsyncedAgentsReason      string = "UnsyncedAgents"
@@ -150,11 +150,6 @@ type AgentClusterInstallSpec struct {
 	// compute nodes.
 	// +optional
 	Compute []AgentMachinePool `json:"compute,omitempty"`
-
-	// Arbiter is the configuration for the machines that have the
-	// arbiter role.
-	// +optional
-	Arbiter *AgentMachinePool `json:"arbiter,omitempty"`
 
 	// APIVIP is the virtual IP used to reach the OpenShift cluster's API.
 	// +optional
@@ -378,12 +373,6 @@ type ProvisionRequirements struct {
 	// +kubebuilder:validation:Minimum=0
 	// +optional
 	WorkerAgents int `json:"workerAgents,omitempty"`
-
-	// ArbiterAgents is the minimum number of matching approved and ready Agents with the arbiter role
-	// required to launch the install.
-	// +kubebuilder:validation:Minimum=0
-	// +optional
-	ArbiterAgents int `json:"arbiterAgents,omitempty"`
 }
 
 // HyperthreadingMode is the mode of hyperthreading for a machine.
@@ -398,9 +387,8 @@ const (
 )
 
 const (
-	MasterAgentMachinePool  string = "master"
-	ArbiterAgentMachinePool string = "arbiter"
-	WorkerAgentMachinePool  string = "worker"
+	MasterAgentMachinePool string = "master"
+	WorkerAgentMachinePool string = "worker"
 )
 
 // PlatformType is a specific supported infrastructure provider.
@@ -474,7 +462,7 @@ type DiskEncryption struct {
 	// Enable/disable disk encryption on master nodes, worker nodes, or all nodes.
 	//
 	// +kubebuilder:default=none
-	// +kubebuilder:validation:Enum=none;all;masters;arbiters;workers;"masters,arbiters";"masters,workers";"arbiters,workers";"masters,arbiters,workers"
+	// +kubebuilder:validation:Enum=none;all;masters;workers
 	EnableOn *string `json:"enableOn,omitempty"`
 
 	// The disk encryption mode to use.

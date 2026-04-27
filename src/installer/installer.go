@@ -38,20 +38,21 @@ import (
 const dryRunMaximumInventoryClientRetries = 3
 
 const (
-	InstallDir                   = "/opt/install-dir"
-	KubeconfigPath               = "/opt/openshift/auth/kubeconfig"
-	minMasterNodes               = 2
-	dockerConfigFile             = "/root/.docker/config.json"
-	assistedControllerNamespace  = "assisted-installer"
-	extractRetryCount            = 3
-	waitForeverTimeout           = time.Duration(1<<63 - 1) // wait forever ~ 292 years
-	singleNodeMasterIgnitionPath = "/opt/openshift/master.ign"
-	waitingForMastersStatusInfo  = "Waiting for masters to join bootstrap control plane"
-	waitingForBootstrapToPrepare = "Waiting for bootstrap node preparation"
-	nodeImagePullService         = "node-image-pull.service"
-	nodeImageOverlayService      = "node-image-overlay.service"
-	openshiftClientBin           = "/usr/bin/oc"
-	registryDataDirOnMedia       = "/run/media/iso/registry"
+	InstallDir                         = "/opt/install-dir"
+	KubeconfigPath                     = "/opt/openshift/auth/kubeconfig"
+	minMasterNodes                     = 2
+	dockerConfigFile                   = "/root/.docker/config.json"
+	assistedControllerNamespace        = "assisted-installer"
+	extractRetryCount                  = 3
+	waitForeverTimeout                 = time.Duration(1<<63 - 1) // wait forever ~ 292 years
+	singleNodeMasterIgnitionPath       = "/opt/openshift/master.ign"
+	waitingForMastersStatusInfo        = "Waiting for masters to join bootstrap control plane"
+	waitingForBootstrapToPrepare       = "Waiting for bootstrap node preparation"
+	nodeImagePullService               = "node-image-pull.service"
+	nodeImageOverlayService            = "node-image-overlay.service"
+	openshiftClientBin                 = "/usr/bin/oc"
+	registryDataDirOnMedia             = "/run/media/iso/registry"
+	hostStageCopyingRegistryDataToDisk = models.HostStage("Copying registry data to disk")
 )
 
 var generalWaitTimeout = 30 * time.Second
@@ -173,7 +174,7 @@ func (i *installer) InstallNode() error {
 		// hence, ensuring the registry data exists on the media.
 		if i.ops.FileExists(registryDataDirOnMedia) && i.Config.Role == string(models.HostRoleMaster) {
 			i.log.Info("Start copying registry data to disk")
-			hostStage := models.HostStageCopyingRegistryDataToDisk
+			hostStage := hostStageCopyingRegistryDataToDisk
 			liveLogger := rsync_logger.NewRsyncInstallerLogWriter(
 				i.log, i.inventoryClient, i.Config.InfraEnvID, i.Config.HostID, &hostStage)
 

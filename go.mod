@@ -65,7 +65,6 @@ require (
 	github.com/cpuguy83/dockercfg v0.3.1 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/distribution/reference v0.6.0 // indirect
-	github.com/docker/distribution v2.8.2+incompatible // indirect
 	github.com/docker/docker v27.3.1+incompatible // indirect
 	github.com/docker/go-connections v0.5.0 // indirect
 	github.com/docker/go-units v0.5.0 // indirect
@@ -189,10 +188,10 @@ replace (
 	github.com/metal3-io/baremetal-operator/apis => github.com/openshift/baremetal-operator/apis v0.0.0-20260123083846-066225b39a39
 	github.com/metal3-io/baremetal-operator/pkg/hardwareutils => github.com/openshift/baremetal-operator/pkg/hardwareutils v0.0.0-20260123083846-066225b39a39
 	github.com/opencontainers/runc => github.com/opencontainers/runc v1.1.12
-	github.com/openshift/assisted-service => github.com/openshift/assisted-service v0.0.0-20250321224641-189c9121f71f
-	github.com/openshift/assisted-service/api => github.com/openshift/assisted-service/api v0.0.0-20251130091629-4096daea4c14
-	github.com/openshift/assisted-service/client => github.com/openshift/assisted-service/client v0.0.0-20251130091629-4096daea4c14
-	github.com/openshift/assisted-service/models => github.com/openshift/assisted-service/models v0.0.0-20251130091629-4096daea4c14
+	github.com/openshift/assisted-service => github.com/openshift/assisted-service v0.0.0-20250521065511-c84135a7decf
+	github.com/openshift/assisted-service/api => github.com/openshift/assisted-service/api v0.0.0-20250521065511-c84135a7decf
+	github.com/openshift/assisted-service/client => github.com/openshift/assisted-service/client v0.0.0-20250521065511-c84135a7decf
+	github.com/openshift/assisted-service/models => github.com/openshift/assisted-service/models v0.0.0-20250521065511-c84135a7decf
 	golang.org/x/crypto => github.com/openshift/golang-crypto v0.33.1-0.20250310193910-9003f682e581
 	sigs.k8s.io/cluster-api => sigs.k8s.io/cluster-api v0.4.5
 	sigs.k8s.io/cluster-api-provider-aws => github.com/openshift/cluster-api-provider-aws v0.2.1-0.20201022175424-d30c7a274820
